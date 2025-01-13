@@ -63,7 +63,17 @@ class TrivialVacuumEnvironment:
         """
         assert action in self.action_space, "Invalid Action"
 
-        ...
+        if action == "Left":
+            agent.performance -= 1
+            agent.location = loc_A
+        elif action == "Right":
+            agent.performance -= 1
+            agent.location = loc_B
+        elif action == "Suck":
+            agent.performance -= 3
+            if self.status[agent.location] == "Dirty":
+                agent.performance += 10
+                self.status[agent.location] = "Clean"
 
     def random_agent(self, agent: Agent) -> str:
         """
@@ -81,7 +91,7 @@ class TrivialVacuumEnvironment:
         >>> action = env.random_agent(agent)
         >>> assert action in env.action_space
         """
-        ...
+        return random.choice(self.action_space)
 
     def reflex_agent(self, agent: Agent) -> str:
         """
@@ -112,7 +122,13 @@ class TrivialVacuumEnvironment:
         >>> env.execute_action(agent, action)
         >>> assert agent.location == loc_A
         """
-        ...
+
+        if (self.status[agent.location] == "Dirty"):
+            return "Suck"
+        elif (agent.location == loc_A):
+            return "Right"
+        else:
+            return "Left"
 
     def model_based_agent(self, agent: AgentMemory) -> str:
         """
@@ -148,4 +164,15 @@ class TrivialVacuumEnvironment:
         >>> action = env.model_based_agent(agent)
         >>> assert action == 'Stay', f"agent should stay at B since both locations are clean, however your action is {action}"
         """
-        ...
+
+        agent.visited[agent.location] = self.status[agent.location]
+        
+        if self.status[agent.location] == "Dirty":
+            return "Suck"
+        elif loc_A in agent.visited and agent.visited[loc_A] == "Clean" and loc_B in agent.visited and agent.visited[loc_B] == "Clean":
+            return "Stay"
+        else:
+            if agent.location == loc_A:
+                return "Right"
+            else:
+                return "Left"
