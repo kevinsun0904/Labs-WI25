@@ -225,4 +225,4 @@ class BinarySearchTree(Tree):
 
         visited.add(node)
 
-        return self.validate_subtree(node.left, min, node.value, visited) or self.validate_subtree(node.right, node.value, max, visited)
+        return self.validate_subtree(node.left, min, node.value, visited) and self.validate_subtree(node.right, node.value, max, visited)
