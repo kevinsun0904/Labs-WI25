@@ -86,7 +86,6 @@ def solve_8_queens(board: List[List[int]], col: int) -> bool:
     if col == len(board):
         return True
     
-    # loop through all the rows and backtrack if a placement doesnt work
     for row in range(len(board)):
 
         if is_safe_row_diag(board, row, col):
