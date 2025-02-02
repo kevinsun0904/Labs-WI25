@@ -15,8 +15,9 @@ def update(q: float, r: float, k: int) -> float:
     Returns:
     float: The updated Q-value.
     """
-    # Note: since k is the number of times the action has been taken before this update, we need to add 1 to k before using it in the formula.
-    # TODO
+    alpha = 1 / (k + 1)  # Learning rate decreases with the number of visits
+    q_new = q + alpha * (r - q)
+    return q_new
 
 
 def greedy(q_estimate: np.ndarray) -> int:
@@ -29,7 +30,7 @@ def greedy(q_estimate: np.ndarray) -> int:
     Returns:
     int: The index of the action with the highest Q-value.
     """
-    # TODO
+    return np.argmax(q_estimate)
 
 
 def egreedy(q_estimate: np.ndarray, epsilon: float) -> int:
@@ -44,7 +45,12 @@ def egreedy(q_estimate: np.ndarray, epsilon: float) -> int:
     Returns:
     int: The index of the selected action.
     """
-    # TODO
+    if np.random.rand() < epsilon:
+        # Explore: choose a random action
+        return np.random.randint(0, len(q_estimate))  # Or q_estimate.size
+    else:
+        # Exploit: choose the action with the highest Q-value
+        return np.argmax(q_estimate)
 
 
 def empirical_egreedy(epsilon: float, n_trials: int, n_arms: int, n_plays: int) -> List[List[float]]:
@@ -65,6 +71,24 @@ def empirical_egreedy(epsilon: float, n_trials: int, n_arms: int, n_plays: int) 
     """
     rewards = []  # stores the rewards for each trial
 
-    # TODO
+    for _ in range(n_trials):
+        trial_rewards = []
+        q_estimate = np.zeros(n_arms)  # Initialize Q-values to 0 for each arm
+        action_counts = np.zeros(n_arms)  # Keep track of how many times each action was taken.
+
+        for _ in range(n_plays):
+            action = egreedy(q_estimate, epsilon) # Use the egreedy function
+
+            # Simulate getting a reward (replace with your actual reward function/environment)
+            reward = np.random.normal(0, 1)  # Example: reward from a normal distribution
+            # In a real setting, this reward would come from interacting with the environment.
+
+            trial_rewards.append(reward)
+
+            # Update Q-value for the chosen action
+            action_counts[action] += 1
+            q_estimate[action] = update(q_estimate[action], reward, action_counts[action] -1) # Use the update function
+
+        rewards.append(trial_rewards)
 
     return rewards
